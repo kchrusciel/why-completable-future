@@ -12,17 +12,19 @@ class S00_OldTimes {
     private static final Logger log = LoggerFactory.getLogger(S00_OldTimes.class);
 
     @Test
-    public void sjug_8() {
+    public void test_15() {
         MyThread myThread = new MyThread();
         myThread.run();
+        //class extends Thread
 
+        //implements Runnable
         MyRunnable myRunnable = new MyRunnable();
         Thread threadForRunnable = new Thread(myRunnable);
         threadForRunnable.start();
     }
 
     @Test
-    public void sjug_25() throws InterruptedException {
+    public void test_27() {
         MyRunnableWithFields task = new MyRunnableWithFields();
         Thread threadForRunnable = new Thread(task);
         threadForRunnable.start();
@@ -59,11 +61,14 @@ class MyRunnable implements Runnable {
 
 class MyRunnableWithFields implements Runnable {
 
+    private static final Logger log = LoggerFactory.getLogger(MyRunnableWithFields.class);
+
     String result;
 
     @Override
     public void run() {
         try {
+            log.info("Sleeping...");
             TimeUnit.MILLISECONDS.sleep(10);
             result = "Done";
         } catch (InterruptedException e) {
