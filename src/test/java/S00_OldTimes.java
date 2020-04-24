@@ -31,7 +31,6 @@ class S00_OldTimes {
 
         while(threadForRunnable.isAlive()) {
             log.info("Blocking...");
-            log.info("Result: " + task.result);
         }
         log.info("After Blocking...");
         log.info("Result: " + task.result);
