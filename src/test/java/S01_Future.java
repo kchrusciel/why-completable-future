@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ class S01_Future {
 	private static final Logger log = LoggerFactory.getLogger(S01_Future.class);
 
 	@Test
-	public void howToRun() throws Exception {
+	public void howToRun() {
 		MyTask myTask = new MyTask();
 		myTask.call();
 
@@ -39,7 +40,7 @@ class S01_Future {
 	}
 
 	@Test
-	public void threadFactory() throws Exception {
+	public void threadFactory() throws ExecutionException, InterruptedException {
 		MyTask myTask = new MyTask();
 
 		ThreadFactory threadFactory = new ThreadFactoryBuilder()
@@ -53,7 +54,16 @@ class S01_Future {
 		ExecutorService executorService = Executors.newFixedThreadPool(10, threadFactory);
 		Future<String> callable = executorService.submit(myTask);
 		callable.get(); //blocking
-		callable.get(5, TimeUnit.SECONDS); //blocking
+
+		try {
+			callable.get(5, TimeUnit.SECONDS); //blocking
+		} catch(InterruptedException e) {
+			e.printStackTrace();
+		} catch(ExecutionException e) {
+			e.printStackTrace();
+		} catch(TimeoutException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Test
