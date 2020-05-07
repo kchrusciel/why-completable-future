@@ -16,18 +16,16 @@ class S03_Transformations {
     private static final Logger log = LoggerFactory.getLogger(S03_Transformations.class);
 
     @Test
-    @DisplayName("Then apply")
-    public void sjug_16() throws ExecutionException, InterruptedException {
+    public void thenApply() {
         CompletableFuture<String> stringResult = CompletableFuture.supplyAsync(someTask(), executorService());
 
-        CompletableFuture<Integer> integerResult = stringResult.thenApply(string -> string.length());
+        CompletableFuture<Integer> integerResult = stringResult.thenApply(String::length); //non-blocking
 
         integerResult.thenApply(integer -> integer + 10);
     }
 
     @Test
-    @DisplayName("Then accept")
-    public void sjug_27() throws ExecutionException, InterruptedException {
+    public void thenAccept() throws ExecutionException, InterruptedException {
         CompletableFuture.supplyAsync(someTask(), executorService())
             .thenAccept(log::info)
             .get();
@@ -35,7 +33,7 @@ class S03_Transformations {
 
     @Test
     @DisplayName("On which thread in few transformations?")
-    public void sjug_37() throws ExecutionException, InterruptedException {
+    public void test_36() throws ExecutionException, InterruptedException {
         CompletableFuture<String> stringCompletableFuture = CompletableFuture.supplyAsync(getString(), executorService());
         stringCompletableFuture.thenApply(getLength())
             .thenApply(addTen())
@@ -45,6 +43,33 @@ class S03_Transformations {
             .thenApply(addTen())
             .get();
         //Perfomance
+    }
+
+    CompletableFuture<Integer> integerResult1 (int value) {
+        return CompletableFuture.completedFuture(value);
+    }
+    CompletableFuture<Integer> integerResult2 (int value) {
+        return CompletableFuture.completedFuture(value);
+    }
+    CompletableFuture<Integer> integerResult3 (int value) {
+        return CompletableFuture.completedFuture(value);
+    }
+    CompletableFuture<Integer> integerResult4 (int value) {
+        return CompletableFuture.completedFuture(value);
+    }
+    CompletableFuture<Integer> integerResult5 (int value) {
+        return CompletableFuture.completedFuture(value);
+    }
+
+    @Test
+    @DisplayName("Flat map")
+    public void thenCompose() {
+        integerResult1(10).thenApply(x -> integerResult2(x));
+
+        integerResult1(10) //callback hell
+                .thenAccept(x -> integerResult2(x)
+                        .thenAccept(y -> integerResult3(y)));
+
     }
 
     private Supplier<String> getString() {

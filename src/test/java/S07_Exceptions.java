@@ -1,45 +1,97 @@
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by CodeCouple.pl
  */
 class S07_Exceptions {
 
-    @Test
-    @DisplayName("exceptionally")
-    public void sjug_14() throws ExecutionException, InterruptedException {
-        CompletableFuture<String> task = CompletableFuture.supplyAsync(() -> "some task")
-                .exceptionally((x)->"default value");
-        //Todo
-    }
+	private static final Logger log = LoggerFactory.getLogger(S07_Exceptions.class);
 
-    @Test
-    @DisplayName("handle")
-    public void sjug_16() throws ExecutionException, InterruptedException {
-        CompletableFuture<String> task = CompletableFuture.supplyAsync(() -> "some task");
+	@Test
+	public void failedFuture() {
+		var failedFuture = CompletableFuture.failedFuture(new IllegalStateException());
+		System.out.println(failedFuture.join());
+	}
 
-        task.handle((x, throwable) -> {
-            if (throwable != null) {
-                return "default value";
-            }
-            return x + "some value";
-        });
-    }
+	@Test
+	public void isCompletedExceptionally() {
+		var failedFuture = CompletableFuture.failedFuture(new IllegalStateException());
+		System.out.println(failedFuture.isCompletedExceptionally());
+	}
 
-    @Test
-    @DisplayName("whenComplete")
-    public void sjug_27() throws ExecutionException, InterruptedException {
-        CompletableFuture<String> task = CompletableFuture.supplyAsync(() -> "some task");
+	@Test
+	public void exceptionally() {
+		var task = CompletableFuture.failedFuture(new IllegalStateException())
+				.exceptionally((x) -> "default value")
+				.exceptionallyAsync((x) -> "default value"); //Java 12
 
-        task.whenComplete((x, throwable) -> {
-            if (throwable != null) {
-                System.out.println("Exception occur");
-            }
-            System.out.println(x);
-        });
-    }
+		System.out.println(task.join());
+	}
+
+	@Test
+	public void completeExceptionally() throws ExecutionException, InterruptedException {
+		var task = CompletableFuture.supplyAsync(() -> "value")
+				.thenApply(x -> {
+					try {
+						Thread.sleep(10_000);
+					} catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+					return "new value";
+				});
+
+		task.completeExceptionally(new IllegalStateException());
+//		task.obtrudeException(new IllegalStateException());
+
+		System.out.println(task.get());
+	}
+
+	@Test
+	@DisplayName("handle")
+	public void handle() throws ExecutionException, InterruptedException {
+		var task = CompletableFuture.failedFuture(new IllegalStateException())
+				.handle((x, throwable) -> {
+					if(throwable != null) {
+						return "default value";
+					}
+					return "x";
+				});
+
+		log.info(task.get());
+	}
+
+	@Test
+	public void whenComplete() throws ExecutionException, InterruptedException {
+		var task = CompletableFuture.failedFuture(new IllegalStateException())
+				.whenComplete((x, throwable) -> {
+					if(throwable != null) {
+						System.out.println("Exception occurs");
+					}
+					System.out.println(x);
+				});
+
+		task.join();
+	}
+
+	@Test
+	public void exceptionallyCompose() throws ExecutionException, InterruptedException {
+		CompletableFuture<Integer> completableFuture = CompletableFuture
+				.supplyAsync(() -> 10 / 0);
+		CompletableFuture<Integer> completableFuture2 = CompletableFuture
+				.supplyAsync(() -> 1);
+
+		CompletableFuture<Integer> exceptionallyCompose = completableFuture
+				.exceptionallyCompose(throwable -> {
+					System.err.println("exception: " + throwable);
+					return completableFuture2;
+				});
+		exceptionallyCompose.thenApply(i -> i * 3)
+				.thenAccept(System.out::println);
+	}
 }

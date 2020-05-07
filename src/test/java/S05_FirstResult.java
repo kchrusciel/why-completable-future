@@ -14,7 +14,7 @@ class S05_FirstResult {
 
     @Test
     @DisplayName("Race example")
-    public void sjug_6() throws ExecutionException, InterruptedException {
+    public void test_17() throws ExecutionException, InterruptedException {
         CompletableFuture<String> task = CompletableFuture.supplyAsync(someTask());
         CompletableFuture<String> otherTask = CompletableFuture.supplyAsync(someOtherTask());
 
@@ -25,7 +25,7 @@ class S05_FirstResult {
 
     @Test
     @DisplayName("The Winner Takes It All")
-    public void sjug_22() throws ExecutionException, InterruptedException {
+    public void test_28() throws ExecutionException, InterruptedException {
         CompletableFuture<String> task = CompletableFuture.supplyAsync(longTask());
         CompletableFuture<String> otherTask = CompletableFuture.supplyAsync(shortTask());
 

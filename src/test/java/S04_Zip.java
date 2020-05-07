@@ -15,8 +15,7 @@ class S04_Zip {
     private static final Logger log = LoggerFactory.getLogger(S04_Zip.class);
 
     @Test
-    @DisplayName("Then Combine")
-    public void sjug_16() throws ExecutionException, InterruptedException {
+    public void thenCombine() throws ExecutionException, InterruptedException {
         CompletableFuture<String> stringResult = CompletableFuture.supplyAsync(someTask(), executorService());
 
         CompletableFuture<Integer> integerResult = CompletableFuture.supplyAsync(someIntegerTask(), executorService());
@@ -27,13 +26,12 @@ class S04_Zip {
 
         log.info(result.get()); //blocking
 
-        //Functionl porgamming is a ZIP opreator
-        //
+        //Functional programming is a ZIP operator
+        //http://reactivex.io/documentation/operators/zip.html
     }
 
     @Test
-    @DisplayName("Then Accept Both")
-    public void sjug_30() throws ExecutionException, InterruptedException {
+    public void thenAcceptBoth() throws ExecutionException, InterruptedException {
         CompletableFuture<String> stringResult = CompletableFuture.supplyAsync(someTask(), executorService());
 
         CompletableFuture<Integer> integerResult = CompletableFuture.supplyAsync(someIntegerTask(), executorService());
